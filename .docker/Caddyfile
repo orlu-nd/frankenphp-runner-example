@@ -1,0 +1,70 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+	    worker {
+	        file ./public/index.php
+	        num 10
+	        env APP_RUNTIME "Runtime\FrankenPhpSymfony\Runtime"
+	    }
+	}
+
+	order php_server before file_server
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+{$SERVER_NAME:localhost} {
+
+    header {
+        # Only allow GET and POST.
+        +Access-Control-Allow-Methods "GET, POST"
+
+        # Set Content-Security-Policy
+        #+Content-Security-Policy "default-src 'self';"
+
+        # Set Cross-Origin-Embedder-Policy
+        +Cross-Origin-Embedder-Policy "require-corp"
+
+        # Set Cross-Origin-Opener-Policy
+        +Cross-Origin-Opener-Policy "same-origin"
+
+        # Set Cross-Origin-Resource-Policy
+        +Cross-Origin-Resource-Policy "same-origin"
+
+        # Set Strict-Transport-Security
+        +Strict-Transport-Security "max-age=31536000"
+
+        # Set X-XSS-Protection
+        +X-XSS-Protection "1; mode=block"
+
+        # Set X-Content-Type-Options
+        +X-Content-Type-Options "nosniff"
+
+        # Set X-XSS-Protection
+        +X-Frame-Options "SAMEORIGIN"
+
+        # Set Referrer-Policy
+        +Referrer-Policy "strict-origin"
+
+        # Set Permissions-Policy
+        +Permissions-Policy "fullscreen=()"
+        # Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
+        ?Permissions-Policy "browsing-topics=()"
+
+        # Delete the X-Generator header that is set by the Sulu CMS:
+        # https://github.com/sulu/sulu-standard/blob/master/CHANGELOG.md
+        # #2192 [WebsiteBundle] Added X-Generator HTTP header for Sulu website detection
+        -X-Generator
+
+        # Delete the Server header
+        -Server
+    }
+
+	root * public/
+	encode zstd br gzip
+
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
+}

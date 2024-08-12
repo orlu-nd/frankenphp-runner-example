@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  frankenphp-runner-example:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8081:80"
+    tty: true
